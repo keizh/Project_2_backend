@@ -1,10 +1,19 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const app = express();
+const corsOptions = {
+  origin: ["*"],
+  allowedMethods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
+  allowedHeaders: ["Content_Type", "Authorization"],
+  //   credentials: true,
+  successOptionsAllowed: 200,
+};
+app.use(cors(corsOptions));
 
+app.use(express.json());
 app.get("/", (req, res) => res.send("Express on Vercel"));
-app.get("/user", (req, res) => res.send("Express on User"));
 
 async function exe() {
   try {
