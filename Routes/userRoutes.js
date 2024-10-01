@@ -14,7 +14,7 @@ router.get(`/sign-up`, (req, res) => {
 });
 
 router.post(`/sign-up`, async (req, res) => {
-  const { name, email, password, userName } = req.body;
+  const { name, email, password, userName, profileImage } = req.body;
   try {
     const encrypted_password = await bcrypt.hash(password, 5);
     const newUser = userModel({
@@ -22,6 +22,7 @@ router.post(`/sign-up`, async (req, res) => {
       email,
       password: encrypted_password,
       userName,
+      profileImage,
     });
     const newUserCreated = await newUser.save();
     if (newUserCreated) {
@@ -93,7 +94,44 @@ router.get(`/list`, async (req, res) => {
 });
 
 router.post(`/addFollower`, auth, async (req, res) => {
+  const { userName, profileImage, userId } = req.body;
+  const currentUserId = req.headers.userId;
   try {
+    const updatedUserData = await userModel.findByIdAndUpdate(
+      currentUserId,
+      { $addToSet: { followers: { userName, profileImage, userId } } },
+      { new: true }
+    );
+    if (updatedUserData) {
+      res.json({
+        message: "Successfully following",
+        endpoint: "/addFollower",
+        updatedUserData,
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `${error.message}`, endpoint: ` / addFollower` });
+  }
+});
+
+router.post(`/removeFollower`, auth, async (req, res) => {
+  const { userId } = req.body;
+  const currentUserId = req.headers.userId;
+  try {
+    const updatedUserData = await userModel.findByIdAndUpdate(
+      currentUserId,
+      { $pull: { followers: { userId } } },
+      { new: true }
+    );
+    if (updatedUserData) {
+      res.json({
+        message: "Successfully removed follower",
+        endpoint: "/addFollower",
+        updatedUserData,
+      });
+    }
   } catch (error) {
     res
       .status(500)
