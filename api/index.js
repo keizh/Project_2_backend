@@ -4,21 +4,18 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
 var connected = false;
-// const exe = require("../db/exe");
+const dbConnect = require("../db/exe");
+// exe function will handle db connecton and will turn connected to true
 async function exe() {
   try {
-    const MONGODBconnectionOBJ = await mongoose.connect(process.env.MONGODB);
-    if (MONGODBconnectionOBJ) {
-      console.log("MONGODB Connection established");
-      connected = true;
-    } else {
-      console.log(`Failed to connect to MongoDB and server not created`);
-    }
+    await dbConnect();
+    connected = true;
   } catch (err) {
     console.log(`${err.message}`);
   }
 }
 exe();
+
 const corsOptions = {
   origin: ["*"],
   allowedMethods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
@@ -26,12 +23,13 @@ const corsOptions = {
   //   credentials: true,
   successOptionsAllowed: 200,
 };
-// middle for cross origin resoure sharing
+// middleware for cross origin resoure sharing
 app.use(cors(corsOptions));
 // middleware to parse body
 app.use(express.json());
-// most basic api-endpoint
+// starting api endpoint
 app.get("/", (req, res) => res.send(`Express on Vercel`));
+// api-end Point to check if db is connected
 app.get("/connect", (req, res) => res.send(`Is it connected: ${connected}`));
 const userRoutes = require(`../Routes/userRoutes`);
 app.use("/api/v1/user", userRoutes);

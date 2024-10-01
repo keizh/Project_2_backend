@@ -1,4 +1,4 @@
-async function exe() {
+async function dbConnect() {
   try {
     const MONGODBconnectionOBJ = await mongoose.connect(process.env.MONGODB);
     if (MONGODBconnectionOBJ) {
@@ -7,8 +7,8 @@ async function exe() {
       console.log(`Failed to connect to MongoDB and server not created`);
     }
   } catch (err) {
-    console.log(`${err.message}`);
+    throw err;
   }
 }
 
-module.exports = exe;
+module.exports = dbConnect;
