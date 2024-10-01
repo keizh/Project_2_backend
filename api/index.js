@@ -3,6 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
+const userRoutes = require(`../Routes/userRoutes`);
+const postRoutes = require(`../Routes/postRoutes`);
 var connected = false;
 const dbConnect = require("../db/dbConnect");
 // exe function will handle db connecton and will turn connected to true
@@ -31,8 +33,9 @@ app.use(express.json());
 app.get("/", (req, res) => res.send(`Express on Vercel`));
 // api-end Point to check if db is connected
 app.get("/connect", (req, res) => res.send(`Is it connected: ${connected}`));
-const userRoutes = require(`../Routes/userRoutes`);
+
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/post", postRoutes);
 
 // MAKE SERVER LISTEN
 app.listen(process.env.PORT, () => console.log("SERVER IS ONLINE "));
