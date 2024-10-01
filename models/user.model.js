@@ -66,7 +66,7 @@ const userSchema = new Schema(
     },
     profileImage: {
       type: String,
-      default: `https://placehold.co/600x400?text=New+User`,
+      default: `https://placehold.co/600x400?text=user`,
     },
     following: [followUserSchema],
     followers: [followUserSchema],
