@@ -75,7 +75,7 @@ router.post(`/sign-in`, async (req, res) => {
   }
 });
 
-router.get(`/list`, auth, async (req, res) => {
+router.get(`/list`, async (req, res) => {
   try {
     const data = await userModel.find().select("name userName email");
     if (data && data.length > 0) {
