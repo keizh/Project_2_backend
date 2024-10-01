@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
 var connected = false;
-const dbConnect = require("../db/exe");
+const dbConnect = require("../db/dbConnect");
 // exe function will handle db connecton and will turn connected to true
 async function exe() {
   try {
