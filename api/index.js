@@ -3,6 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
+const exe = require("../db/exe");
+exe();
 const corsOptions = {
   origin: ["*"],
   allowedMethods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
@@ -20,18 +22,6 @@ const userRoutes = require(`../Routes/userRoutes`);
 app.use("/api/v1/user", userRoutes);
 
 // code to setUp MONGOdb CONNECTION AND MAKE SERVER LISTEN
-async function exe() {
-  try {
-    const MONGODBconnectionOBJ = await mongoose.connect(process.env.MONGODB);
-    if (MONGODBconnectionOBJ) {
-      console.log("MONGODB Connection established");
-    } else {
-      console.log(`Failed to connect to MongoDB and server not created`);
-    }
-  } catch (err) {
-    console.log(`${err.message}`);
-  }
-}
-exe();
+
 app.listen(5500, () => console.log("SERVER IS ONLINE "));
 module.exports = app;
