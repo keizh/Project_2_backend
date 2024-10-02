@@ -1,5 +1,6 @@
 const mongoose = require(`mongoose`);
 const { Schema, model } = mongoose;
+const uniqid = require("uniqid");
 
 const followUserSchema = new Schema(
   {
@@ -18,28 +19,6 @@ const followUserSchema = new Schema(
   },
   { timestamps: true }
 );
-
-// const bookmarkSchema = new Schema(
-//   {
-//     postImage: {
-//       type: String,
-//       required: true,
-//     },
-//     postUserName: {
-//       type: String,
-//       required: true,
-//     },
-//     postId: {
-//       type: mongoose.Schema.Types.ObjectId,
-//       required: true,
-//     },
-//     postContent: {
-//       type: String,
-//       required: true,
-//     },
-//   },
-//   { timestamps: true }
-// );
 
 const userSchema = new Schema(
   {
@@ -70,14 +49,25 @@ const userSchema = new Schema(
     },
     following: [followUserSchema],
     followers: [followUserSchema],
-    // bookmarks: [bookmarkSchema],
     createdOn: {
       type: String,
       default: `${new Date().getDate()} / ${
         new Date().getMonth() + 1
       } / ${new Date().getFullYear()} `,
     },
-    updates: [String],
+    requestUpdates: [
+      {
+        content: String,
+        userIdOfSender: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "user",
+        },
+        reqId: {
+          type: String,
+          default: () => uniqid(),
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

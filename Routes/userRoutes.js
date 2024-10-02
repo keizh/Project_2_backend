@@ -153,21 +153,158 @@ router.post(`/removeFollower`, auth, async (req, res) => {
 });
 
 // to fetch specific user
-router.post(`/:userId`, auth, async (req, res) => {});
+router.get(`/:userId`, auth, async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const userFetched = await userModel.findById(userId);
+    if (userFetched) {
+      res.status(200).json({
+        message: "user details fetched",
+        userFetched,
+        endpoint: `/:userId`,
+      });
+    } else {
+      res.status(400).json({
+        message: "failed to fetch user details",
+        endpoint: `/:userId`,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `${error.message}`, endpoint: `/:userId` });
+  }
+});
 
 // delete user account
-router.delete(`/:userId`, auth, async (req, res) => {});
+router.delete(`/:userId`, auth, async (req, res) => {
+  try {
+    const userDeleted = await userModel.findByIdAndDelete(userId);
+    if (userDeleted) {
+      res.status(200).json({
+        message: "USER SUCCESSFULLY DELETED",
+        userDeleted,
+        endpoint: `/:userId`,
+      });
+    } else {
+      res
+        .status(400)
+        .json({ message: "FAILED TO DELETE USER", endpoint: `/:userId` });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `${error.message}`, endpoint: `/:userId` });
+  }
+});
 
 // UNFOLLOW SOMEONE
-router.delete(`/unfollow`, auth, async (req, res) => {});
+router.post(`/unfollow`, auth, async (req, res) => {
+  const { userId, name, userName } = req.headers;
+  const { userId: FollowerUserId } = req.body;
+  try {
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { following: { userId: FollowerUserId } } },
+      { new: true }
+    );
+    if (updatedUser) {
+      res.status(200).json({
+        message: "Successfully unfollowed",
+        endpoint: "/unfollow",
+        updatedUser,
+      });
+    } else {
+      res
+        .status(400)
+        .json({ message: "Failed to unfollow", endpoint: "/unfollow" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `${error.message}`, endpoint: "/unfollow" });
+  }
+});
 
-// SEND FOLLOW REQUEST
-router.delete(`/unfollow`, auth, async (req, res) => {});
+// SEND FOLLOW REQUEST Update
+router.post(`/followRequest`, auth, async (req, res) => {
+  const { userId, name, userName } = req.headers;
+  const { userId: userIdToWhomFollowRequestIsToBeSent } = req.body;
+  try {
+    const userUpdated = await userModel.findByIdAndUpdate(
+      userIdToWhomFollowRequestIsToBeSent,
+      {
+        $addToSet: {
+          requestUpdates: {
+            content: `${userName} has sent you a follow request`,
+            userIdOfSender: userId,
+          },
+        },
+      },
+      { new: true }
+    );
+
+    if (userUpdated) {
+      res.status(200).json({
+        message: "follow request successfully sent",
+        endpoint: `/followRequest`,
+        userUpdated,
+      });
+    } else {
+      res.status(400).json({
+        message: "failed to send follow request",
+        endpoint: `/followRequest`,
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `${error.message}`, endpoint: `/followRequest` });
+  }
+});
+
+// Fetch Update
+router.get(`/fetchReqUpdates`, auth, async (req, res) => {
+  const { userId, name, userName } = req.headers;
+  try {
+    const user = await userModel.findById(userId);
+    if (user) {
+      res.status(200).json({
+        message: "request updates fetched successfully",
+        endpoint: `/fetchReqUpdates`,
+        user,
+      });
+    } else {
+      res.status(400).json({
+        message: "failed to fetch request update",
+        endpoint: `/fetchReqUpdates`,
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `${error.message}`, endpoint: `/fetchReqUpdates` });
+  }
+});
 
 // REMOVE UPDATES
-router.post(`/filterUpdates`, auth, async (req, res) => {});
-
-// Add updates
-router.post(`/addUpdates`, auth, async (req, res) => {});
+router.post(`/filterUpdates`, auth, async (req, res) => {
+  const { userId, name, userName } = req.headers;
+  const { reqId } = req.body;
+  try {
+    const userupdated = await userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { requestUpdates: { reqId } } },
+      { new: true }
+    );
+    if (userupdated) {
+      res
+        .status(200)
+        .json({ message: "successful", endpoint: `/filterUpdates` });
+    } else {
+      res.status(400).json({ message: "failed", endpoint: `/filterUpdates` });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `${error.message}`, endpoint: `/filterUpdates` });
+  }
+});
 
 module.exports = router;
