@@ -8,6 +8,7 @@ const auth = (req, res, next) => {
       if (decoded.exp > Date.now() / 1000) {
         req.headers.userId = decoded.userId;
         req.headers.name = decoded.name;
+        req.headers.userName = decoded.userName;
         next();
       } else {
         res.status(400).json({ message: "Authorization Token expired" });

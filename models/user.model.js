@@ -77,6 +77,7 @@ const userSchema = new Schema(
         new Date().getMonth() + 1
       } / ${new Date().getFullYear()} `,
     },
+    updates: [String],
   },
   { timestamps: true }
 );

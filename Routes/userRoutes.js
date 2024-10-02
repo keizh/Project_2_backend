@@ -52,7 +52,11 @@ router.post(`/sign-in`, async (req, res) => {
       const result = await bcrypt.compare(password, userFetchedFromDB.password);
       if (result) {
         var token = JWT.sign(
-          { userId: userFetchedFromDB._id, name: userFetchedFromDB.name },
+          {
+            userId: userFetchedFromDB._id,
+            name: userFetchedFromDB.name,
+            userName: userFetchedFromDB.userName,
+          },
           process.env.JWT_Password,
           { expiresIn: "5h" }
         );
@@ -78,7 +82,9 @@ router.post(`/sign-in`, async (req, res) => {
 
 router.get(`/list`, async (req, res) => {
   try {
-    const data = await userModel.find().select("name userName email");
+    const data = await userModel
+      .find()
+      .select("name userName email _id profileImage");
     if (data && data.length > 0) {
       res
         .status(200)
@@ -93,6 +99,7 @@ router.get(`/list`, async (req, res) => {
   }
 });
 
+// ADD FOLLOWER TO YOUR ACCOUNT AFTER REQUEST IS SENT
 router.post(`/addFollower`, auth, async (req, res) => {
   const { userName, profileImage, userId } = req.body;
   const currentUserId = req.headers.userId;
@@ -116,6 +123,7 @@ router.post(`/addFollower`, auth, async (req, res) => {
   }
 });
 
+// REMOVE FOLLOWER
 router.post(`/removeFollower`, auth, async (req, res) => {
   const { userId } = req.body;
   const currentUserId = req.headers.userId;
@@ -138,5 +146,23 @@ router.post(`/removeFollower`, auth, async (req, res) => {
       .json({ message: `${error.message}`, endpoint: ` / addFollower` });
   }
 });
+
+// to fetch specific user
+router.post(`/:userId`, auth, async (req, res) => {});
+
+// delete user account
+router.delete(`/:userId`, auth, async (req, res) => {});
+
+// UNFOLLOW SOMEONE
+router.delete(`/unfollow`, auth, async (req, res) => {});
+
+// SEND FOLLOW REQUEST
+router.delete(`/unfollow`, auth, async (req, res) => {});
+
+// REMOVE UPDATES
+router.post(`/filterUpdates`, auth, async (req, res) => {});
+
+// Add updates
+router.post(`/addUpdates`, auth, async (req, res) => {});
 
 module.exports = router;

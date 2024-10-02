@@ -1,5 +1,6 @@
 const mongoose = require(`mongoose`);
 const { Schema, model } = mongoose;
+const uniqid = require("uniqid");
 
 const postSchema = mongoose.Schema(
   {
@@ -36,6 +37,10 @@ const postSchema = mongoose.Schema(
         createdOn: {
           type: Date,
           default: Date.now,
+        },
+        commentId: {
+          type: String,
+          default: () => uniqid(),
         },
       },
     ],
