@@ -2,6 +2,8 @@ const express = require(`express`);
 const router = express.Router();
 const { userModel } = require("../models/user.model");
 const { postModel } = require("../models/post.model");
+const { bookmarkModel } = require(`../models/bookmarks.model`);
+
 const auth = require("../auth");
 
 // FETCH POSTS FOR THE USER , WHO IS SIGNED-IN AT THE MOMENT
@@ -166,44 +168,79 @@ router.post(`/removeCommentPostOwner`, auth, async (req, res) => {
 });
 
 router.post(`/addPost`, auth, async (req, res) => {
+  const { userId, name, userName } = req.headers;
+  const { content, images } = req.body;
   try {
+    const newPost = new postModel({ userId, userName, content, images });
+    const newPostCreated = await newPost.save();
+    if (newPostCreated) {
+      res.status(201).json({
+        message: "New Post is Created",
+        newPostCreated,
+        endpoint: ` /addPost`,
+      });
+    } else {
+      res.status(400).json({
+        message: "New Post creation Failed",
+        endpoint: ` /addPost`,
+      });
+    }
   } catch (error) {
-    res.status(500).json({ message: `${error.message}`, endpoint: ` /unlike` });
+    res
+      .status(500)
+      .json({ message: `${error.message}`, endpoint: ` /addPost` });
   }
 });
 
 router.post(`/updatePost`, auth, async (req, res) => {
+  const { userId, name, userName } = req.headers;
+  const { content, images, postId } = req.body;
   try {
+    const updatedPost = await postModel.findByIdAndUpdate(
+      postId,
+      { $set: { content, images } },
+      { new: true }
+    );
+    if (updatedPost) {
+      res.status(200).json({
+        message: "Post Updated Successfully",
+        updatedPost,
+        endpoint: ` /updatePost`,
+      });
+    } else {
+      res.status(400).json({
+        message: "Post Update Failed",
+        updatedPost,
+        endpoint: ` /updatePost`,
+      });
+    }
   } catch (error) {
-    res.status(500).json({ message: `${error.message}`, endpoint: ` /unlike` });
+    res
+      .status(500)
+      .json({ message: `${error.message}`, endpoint: ` /updatePost` });
   }
 });
 
-router.post(`/removePost`, auth, async (req, res) => {
+router.delete(`/removePost/:id`, auth, async (req, res) => {
+  const { userId, name, userName } = req.headers;
+  const postId = req.params.id;
   try {
+    const deletedPost = await postModel.findByIdAndDelete(postId);
+    if (deletedPost) {
+      res.status(200).json({
+        message: "successfully deleted",
+        deletedPost,
+        endpoint: `/removePost/:id`,
+      });
+    } else {
+      res
+        .status(400)
+        .json({ message: "failed to delete", endpoint: `/removePost/:id` });
+    }
   } catch (error) {
-    res.status(500).json({ message: `${error.message}`, endpoint: ` /unlike` });
-  }
-});
-
-router.post(`/addBookMart`, auth, async (req, res) => {
-  try {
-  } catch (error) {
-    res.status(500).json({ message: `${error.message}`, endpoint: ` /unlike` });
-  }
-});
-
-router.post(`/removeBookMark`, auth, async (req, res) => {
-  try {
-  } catch (error) {
-    res.status(500).json({ message: `${error.message}`, endpoint: ` /unlike` });
-  }
-});
-
-router.get(`/bookmarks`, auth, async (req, res) => {
-  try {
-  } catch (error) {
-    res.status(500).json({ message: `${error.message}`, endpoint: ` /unlike` });
+    res
+      .status(500)
+      .json({ message: `${error.message}`, endpoint: `/removePost/:id` });
   }
 });
 

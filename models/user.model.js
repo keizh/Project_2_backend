@@ -19,27 +19,27 @@ const followUserSchema = new Schema(
   { timestamps: true }
 );
 
-const bookmarkSchema = new Schema(
-  {
-    postImage: {
-      type: String,
-      required: true,
-    },
-    postUserName: {
-      type: String,
-      required: true,
-    },
-    postId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    },
-    postContent: {
-      type: String,
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
+// const bookmarkSchema = new Schema(
+//   {
+//     postImage: {
+//       type: String,
+//       required: true,
+//     },
+//     postUserName: {
+//       type: String,
+//       required: true,
+//     },
+//     postId: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       required: true,
+//     },
+//     postContent: {
+//       type: String,
+//       required: true,
+//     },
+//   },
+//   { timestamps: true }
+// );
 
 const userSchema = new Schema(
   {
@@ -70,7 +70,7 @@ const userSchema = new Schema(
     },
     following: [followUserSchema],
     followers: [followUserSchema],
-    bookmarks: [bookmarkSchema],
+    // bookmarks: [bookmarkSchema],
     createdOn: {
       type: String,
       default: `${new Date().getDate()} / ${

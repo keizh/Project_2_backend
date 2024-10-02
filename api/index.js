@@ -5,6 +5,7 @@ const cors = require("cors");
 const app = express();
 const userRoutes = require(`../Routes/userRoutes`);
 const postRoutes = require(`../Routes/postRoutes`);
+const bookmarkRoutes = require(`../Routes/bookmarkRoutes`);
 var connected = false;
 const dbConnect = require("../db/dbConnect");
 // exe function will handle db connecton and will turn connected to true
@@ -36,6 +37,7 @@ app.get("/connect", (req, res) => res.send(`Is it connected: ${connected}`));
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/post", postRoutes);
+app.use("/api/v1/bookmark", bookmarkRoutes);
 
 // MAKE SERVER LISTEN
 app.listen(process.env.PORT, () => console.log("SERVER IS ONLINE "));

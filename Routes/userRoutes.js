@@ -1,6 +1,7 @@
 const express = require(`express`);
 const router = express.Router();
 const { userModel } = require(`../models/user.model`);
+const { bookmarkModel } = require(`../models/bookmarks.model`);
 const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
 const auth = require(`../auth.js`);
@@ -25,11 +26,15 @@ router.post(`/sign-up`, async (req, res) => {
       profileImage,
     });
     const newUserCreated = await newUser.save();
+    const newUserBookmarks = await bookmarkModel({
+      userId: newUserCreated._id,
+    }).save();
     if (newUserCreated) {
       res.status(201).json({
         message: "New User created",
         endpoint: `sign-up post`,
         newUserCreated,
+        newUserBookmarks,
       });
     } else {
       res.status(400).json({
