@@ -20,12 +20,13 @@ async function exe() {
 exe();
 
 const corsOptions = {
-  origin: ["*"],
-  allowedMethods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
-  allowedHeaders: ["Content_Type", "Authorization"],
-  //   credentials: true,
-  successOptionsAllowed: 200,
+  origin: "http://localhost:5173", // or an array of allowed origins like ['http://localhost:5173', 'http://example.com']
+  methods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
+  allowedHeaders: ["Content-Type", "Authorization"], // Correct header names
+  //   credentials: true, // Uncomment if you need to send cookies with requests
+  optionsSuccessStatus: 204, // Use 204 for successful preflight requests
 };
+
 // middleware for cross origin resoure sharing
 app.use(cors(corsOptions));
 // middleware to parse body

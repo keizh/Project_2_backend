@@ -18,7 +18,8 @@ router.get(`/sign-up`, (req, res) => {
 
 // WORKING
 router.post(`/sign-up`, async (req, res) => {
-  const { name, email, password, userName, profileImage } = req.body;
+  const { name, email, password, userName } = req.body;
+  // , profileImage <-- add later in user req.body
   try {
     // Check for duplicate userName and email
     const duplicateuserName = await userModel.findOne({
@@ -28,7 +29,7 @@ router.post(`/sign-up`, async (req, res) => {
 
     // Handle duplicates
     if (duplicateuserName && duplicateemail) {
-      return Zres.status(400).json({
+      return res.status(400).json({
         message: "Both username & email already exist",
       });
     } else if (duplicateuserName) {
@@ -46,7 +47,7 @@ router.post(`/sign-up`, async (req, res) => {
       email,
       password: encrypted_password,
       userName,
-      profileImage,
+      // profileImage,
     });
     const newUserCreated = await newUser.save();
     const newUserBookmarks = await bookmarkModel({
@@ -100,7 +101,10 @@ router.post(`/sign-in`, async (req, res) => {
           .json({ message: "Incorrect Password", endpoint: `sign-in post` });
       }
     } else {
-      res.status(404).json({ message: "No Account", endpoint: `sign-in post` });
+      res.status(404).json({
+        message: `No Account is registered under ${email}`,
+        endpoint: `sign-in post`,
+      });
     }
   } catch (error) {
     res
