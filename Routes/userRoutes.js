@@ -20,6 +20,26 @@ router.get(`/sign-up`, (req, res) => {
 router.post(`/sign-up`, async (req, res) => {
   const { name, email, password, userName, profileImage } = req.body;
   try {
+    // Check for duplicate userName and email
+    const duplicateuserName = await userModel.findOne({
+      userName: new RegExp(`^${userName}$`, "i"),
+    });
+    const duplicateemail = await userModel.findOne({ email });
+
+    // Handle duplicates
+    if (duplicateuserName && duplicateemail) {
+      return Zres.status(400).json({
+        message: "Both username & email already exist",
+      });
+    } else if (duplicateuserName) {
+      return res.status(400).json({
+        message: "UserName already exists, choose different UserName",
+      });
+    } else if (duplicateemail) {
+      return res
+        .status(400)
+        .json({ message: "Email already exists, choose different Email" });
+    }
     const encrypted_password = await bcrypt.hash(password, 5);
     const newUser = userModel({
       name,
