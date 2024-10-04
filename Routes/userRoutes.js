@@ -6,14 +6,17 @@ const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
 const auth = require(`../auth.js`);
 
+// WORKING
 router.get(`/sign-in`, (req, res) => {
   res.status(200).json({ message: "user sign-in endpoint was hit" });
 });
 
+// WORKING
 router.get(`/sign-up`, (req, res) => {
   res.status(200).json({ message: "user sign-up endpoint was hit" });
 });
 
+// WORKING
 router.post(`/sign-up`, async (req, res) => {
   const { name, email, password, userName, profileImage } = req.body;
   try {
@@ -49,6 +52,7 @@ router.post(`/sign-up`, async (req, res) => {
   }
 });
 
+// WORKING
 router.post(`/sign-in`, async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -85,6 +89,7 @@ router.post(`/sign-in`, async (req, res) => {
   }
 });
 
+// WORKING
 router.get(`/list`, async (req, res) => {
   try {
     const data = await userModel
@@ -104,6 +109,7 @@ router.get(`/list`, async (req, res) => {
   }
 });
 
+// WORKING
 // ADD FOLLOWER TO YOUR ACCOUNT AFTER REQUEST IS SENT
 router.post(`/addFollower`, auth, async (req, res) => {
   const { userName, profileImage, userId } = req.body;
@@ -128,6 +134,7 @@ router.post(`/addFollower`, auth, async (req, res) => {
   }
 });
 
+// WORKING
 // REMOVE FOLLOWER
 router.post(`/removeFollower`, auth, async (req, res) => {
   const { userId } = req.body;
