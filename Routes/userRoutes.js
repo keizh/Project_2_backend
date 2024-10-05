@@ -47,7 +47,10 @@ router.post(`/sign-up`, async (req, res) => {
       email,
       password: encrypted_password,
       userName,
-      // profileImage,
+      profileImage: `https://placehold.co/600x400?text=${name
+        .split(" ")
+        .map((ele) => ele[0])
+        .join("")}`,
     });
     const newUserCreated = await newUser.save();
     const newUserBookmarks = await bookmarkModel({
@@ -138,13 +141,27 @@ router.get(`/list`, async (req, res) => {
 router.post(`/addFollower`, auth, async (req, res) => {
   const { userName, profileImage, userId } = req.body;
   const currentUserId = req.headers.userId;
+  const currentUserName = req.headers.userName;
   try {
     const updatedUserData = await userModel.findByIdAndUpdate(
       currentUserId,
       { $addToSet: { followers: { userName, profileImage, userId } } },
       { new: true }
     );
-    if (updatedUserData) {
+    const { currprofileImage } = await userModel
+      .findById(currentUserId)
+      .select("profileImage");
+    const DataOfUserToWhomYouAllowedFollowingYou =
+      await userModel.findByIdAndUpdate(
+        userId,
+        {
+          $addToSet: {
+            following: { currentUserName, currprofileImage, currentUserId },
+          },
+        },
+        { new: true }
+      );
+    if (updatedUserData && DataOfUserToWhomYouAllowedFollowingYou) {
       res.json({
         message: "Successfully following",
         endpoint: "/addFollower",
@@ -169,7 +186,12 @@ router.post(`/removeFollower`, auth, async (req, res) => {
       { $pull: { followers: { userId } } },
       { new: true }
     );
-    if (updatedUserData) {
+    const updatedFollowerUserData = await userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { following: { currentUserId } } },
+      { new: true }
+    );
+    if (updatedUserData && updatedFollowerUserData) {
       res.json({
         message: "Successfully removed follower",
         endpoint: "/addFollower",

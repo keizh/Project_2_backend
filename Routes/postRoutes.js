@@ -27,6 +27,8 @@ router.get(`/posts`, auth, async (req, res) => {
   }
 });
 
+// Fetch Posts OF the USER
+
 // Like a post
 router.post(`/like`, auth, async (req, res) => {
   const currentUserId = req.headers.userId;

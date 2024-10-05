@@ -20,7 +20,7 @@ async function exe() {
 exe();
 
 const corsOptions = {
-  origin: "http://localhost:5173", // or an array of allowed origins like ['http://localhost:5173', 'http://example.com']
+  origin: "*", // or an array of allowed origins like ['http://localhost:5173', 'http://example.com']
   methods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
   allowedHeaders: ["Content-Type", "Authorization"], // Correct header names
   //   credentials: true, // Uncomment if you need to send cookies with requests
