@@ -20,7 +20,9 @@ router.get(`/posts`, auth, async (req, res) => {
         .status(200)
         .json({ message: "posts fetched", endpoint: "/posts", posts });
     } else {
-      res.status(400).json({ message: "No Posts", endpoint: "/posts" });
+      res
+        .status(400)
+        .json({ usersFollowingIds, message: "No Posts", endpoint: "/posts" });
     }
   } catch (error) {
     res.status(500).json({ message: `${error.message}`, endpoint: ` /posts` });
@@ -105,6 +107,29 @@ router.post(`/addComment`, auth, async (req, res) => {
     res
       .status(500)
       .json({ message: `${error.message}`, endpoint: ` /addComment` });
+  }
+});
+
+router.post(`/isLikedOrNot`, auth, async (req, res) => {
+  const { postId } = req.body;
+  const { userId } = req.headers;
+  try {
+    const likedOrNot = await postModel.findOne({
+      _id: postId,
+      likes: userId,
+    });
+    if (likedOrNot) {
+      return res.status(200).json({ message: true, endpoint: `/isLikedOrNot` });
+    } else {
+      return res
+        .status(200)
+        .json({ message: false, endpoint: `/isLikedOrNot` });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: `${error.message}`,
+      endpoint: `/isLikedOrNot`,
+    });
   }
 });
 

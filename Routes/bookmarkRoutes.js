@@ -34,6 +34,29 @@ router.post(`/addBookmark`, auth, async (req, res) => {
   }
 });
 
+// the below route is for checking if
+router.post(`/checking`, auth, async (req, res) => {
+  const { userId } = req.headers;
+  const { postId } = req.body;
+  try {
+    const checked = await bookmarkModel.findOne({ userId, bookmarks: postId });
+    if (checked) {
+      return res
+        .status(200)
+        .json({ message: true, checked, endpoint: `/checking` });
+    } else {
+      return res
+        .status(200)
+        .json({ message: false, checked, endpoint: `/checking` });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: `${error.message}`,
+      endpoint: `/checking`,
+    });
+  }
+});
+
 router.delete(`/removeBookMark/:id`, auth, async (req, res) => {
   const { userId, name, userName } = req.headers;
   const postId = req.params.id;

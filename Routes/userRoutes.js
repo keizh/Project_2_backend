@@ -143,12 +143,15 @@ router.post(`/addFollower`, auth, async (req, res) => {
   const currentUserId = req.headers.userId;
   const currentUserName = req.headers.userName;
   try {
+    if (userId == currentUserId) {
+      return res.status(404).json({ message: "No Self following" });
+    }
     const updatedUserData = await userModel.findByIdAndUpdate(
       currentUserId,
       { $addToSet: { followers: { userName, profileImage, userId } } },
       { new: true }
     );
-    const { currprofileImage } = await userModel
+    const otherUser = await userModel
       .findById(currentUserId)
       .select("profileImage");
     const DataOfUserToWhomYouAllowedFollowingYou =
@@ -156,7 +159,11 @@ router.post(`/addFollower`, auth, async (req, res) => {
         userId,
         {
           $addToSet: {
-            following: { currentUserName, currprofileImage, currentUserId },
+            following: {
+              userName: currentUserName,
+              profileImage: otherUser.profileImage,
+              userId: currentUserId,
+            },
           },
         },
         { new: true }
@@ -166,12 +173,14 @@ router.post(`/addFollower`, auth, async (req, res) => {
         message: "Successfully following",
         endpoint: "/addFollower",
         updatedUserData,
+        DataOfUserToWhomYouAllowedFollowingYou,
+        otherUser,
       });
     }
   } catch (error) {
     res
       .status(500)
-      .json({ message: `${error.message}`, endpoint: ` / addFollower` });
+      .json({ message: `${error.message}`, endpoint: ` /addFollower` });
   }
 });
 
