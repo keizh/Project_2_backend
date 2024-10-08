@@ -184,6 +184,39 @@ router.post(`/addFollower`, auth, async (req, res) => {
   }
 });
 
+// find all all users whom we are following yet
+router.get(`/YetToFollow`, auth, async (req, res) => {
+  const { userId } = req.headers;
+  try {
+    const followingDocument = await userModel
+      .findById(userId)
+      .select("following");
+    const potentialUsers = await userModel
+      .find({ _id: { $nin: [...followingDocument.following, userId] } })
+      .select("_id name userName profileImage");
+    if (potentialUsers && potentialUsers.length > 0) {
+      res.status(200).json({
+        message: "list of unFollowed people",
+        potentialUsers,
+        endpoint: "/YetNoFollowed",
+      });
+    } else {
+      res.status(404).json({
+        message: "list of unfollowed people is empty",
+        endpoint: "/YetNoFollowed",
+      });
+    }
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: `${err.message}`, endpoint: "/YetNoFollowed" });
+  }
+});
+
+router.get(`/home`, auth, async (req, res) => {
+  res.status(200).json({ message: "home" });
+});
+
 // WORKING
 // REMOVE FOLLOWER
 router.post(`/removeFollower`, auth, async (req, res) => {
