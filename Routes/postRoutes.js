@@ -5,20 +5,53 @@ const { postModel } = require("../models/post.model");
 const { bookmarkModel } = require(`../models/bookmarks.model`);
 
 const auth = require("../auth");
+const { getConstantValue } = require("typescript");
 
 // FETCH POSTS FOR THE USER , WHO IS SIGNED-IN AT THE MOMENT
+// checking if the the user added a like & bookmark or not
 router.get(`/posts`, auth, async (req, res) => {
   const currentUserId = req.headers.userId;
   try {
     const usersFollowing = await userModel
       .findById(currentUserId)
-      .select("following");
+      .select("following")
+      .lean();
     const usersFollowingIds = usersFollowing.following.map((ele) => ele.userId);
-    const posts = await postModel.find({ userId: { $in: usersFollowingIds } });
+    const posts = await postModel
+      .find({ userId: { $in: usersFollowingIds } })
+      .lean();
+
+    const bookmarks = await bookmarkModel
+      .findOne({ userId: currentUserId })
+      .lean();
+    console.log(bookmarks);
+
+    // this updated posts array contains userLiked/userBookmark
+    const updatedPostsArray = posts.map((post) => {
+      post.userLiked = post.likes.find(
+        (userId) => String(userId) == String(currentUserId)
+      )
+        ? true
+        : false;
+
+      post.userBookmark = bookmarks.bookmarks.find(
+        (userId) => String(userId) == String(post._id)
+      )
+        ? true
+        : false;
+
+      return post;
+    });
+
+    console.log(updatedPostsArray);
+    console.log(`------------------------------------->`);
+
     if (posts && posts.length > 0) {
-      res
-        .status(200)
-        .json({ message: "posts fetched", endpoint: "/posts", posts });
+      res.status(200).json({
+        message: "posts fetched",
+        endpoint: "/posts",
+        updatedPostsArray,
+      });
     } else {
       res
         .status(400)
@@ -268,6 +301,48 @@ router.delete(`/removePost/:id`, auth, async (req, res) => {
     res
       .status(500)
       .json({ message: `${error.message}`, endpoint: `/removePost/:id` });
+  }
+});
+
+router.get(`/fetchPosts/:id`, auth, async (req, res) => {
+  const { id } = req.params;
+  const currentUserId = req.headers.userId;
+  const bookmarks = await bookmarkModel.findOne({ userId: id });
+  try {
+    var posts = await postModel.find({ userId: id }).lean();
+    if (posts && posts.length > 0) {
+      posts = posts.map((post) => {
+        post.userBookmark = bookmarks?.bookmarks.find(
+          (IdOfPost) => String(IdOfPost) == String(post._id)
+        )
+          ? true
+          : false;
+
+        post.userLiked = post.likes.find(
+          (userIdOfLiker) => userIdOfLiker == currentUserId
+        )
+          ? true
+          : false;
+
+        return post;
+      });
+      res.status(200).json({
+        message: "Posts fetches",
+        userId: id,
+        endpoint: "/fetchPost/:id",
+        posts,
+      });
+    } else {
+      res.status(400).json({
+        message: "Posts fetches",
+        userId: id,
+        endpoint: "/fetchPost/:id",
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `${error.message}`, endpoint: "/fetchPost/:id" });
   }
 });
 

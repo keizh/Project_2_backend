@@ -59,8 +59,20 @@ const userSchema = new Schema(
     },
     requestUpdates: [
       {
+        profileImage: {
+          type: String,
+          required: true,
+        },
+        type: {
+          type: "string",
+          required: true,
+        },
         content: String,
         userIdOfSender: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "user",
+        },
+        userIdtoWhomIsWasSent: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "user",
         },
@@ -68,6 +80,8 @@ const userSchema = new Schema(
           type: String,
           default: () => uniqid(),
         },
+        userName: String,
+        name: String,
       },
     ],
   },
