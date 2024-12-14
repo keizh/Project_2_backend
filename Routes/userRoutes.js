@@ -149,6 +149,15 @@ router.post(`/addFollower`, auth, async (req, res) => {
       return res.status(404).json({ message: "No Self following" });
     }
     // adding follower is working
+    const doesSuchAlreadyExist = await userModel.findOne({
+      _id: currentUserId,
+      followers: { $elemMatch: { userId } },
+    });
+
+    if (doesSuchAlreadyExist) {
+      return res.status(400).json({ message: "Aldready exists such follower" });
+    }
+
     const updatedUserData = await userModel.findByIdAndUpdate(
       currentUserId,
       {
