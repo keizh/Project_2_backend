@@ -9,7 +9,7 @@ async function dbConnect() {
       console.log(`Failed to connect to MongoDB and server not created`);
     }
   } catch (err) {
-    throw err;
+    console.log(err.mess);
   }
 }
 

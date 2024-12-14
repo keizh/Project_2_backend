@@ -1,23 +1,26 @@
-const { jwtDecode } = require("jwt-decode");
+const jwt = require("jsonwebtoken");
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
+
   if (authorization) {
     try {
-      const decoded = jwtDecode(authorization);
-      if (decoded.exp > Date.now() / 1000) {
-        req.headers.userId = decoded.userId;
-        req.headers.name = decoded.name;
-        req.headers.userName = decoded.userName;
-        next();
+      const decoded = jwt.verify(authorization, process.env.JWT_Password);
+      req.headers.userId = decoded.userId;
+      req.headers.name = decoded.name;
+      req.headers.userName = decoded.userName;
+      next();
+    } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({ message: "Token has expired" });
+      } else if (err.name === "JsonWebTokenError") {
+        return res.status(400).json({ message: "Invalid token" });
       } else {
-        res.status(400).json({ message: "Authorization Token expired" });
+        return res.status(500).json({ message: err.message });
       }
-    } catch (error) {
-      res.status(400).json({ message: "Invalid Authorization Token" });
     }
   } else {
-    res.status(400).json({ message: "No Authorization Token" });
+    return res.status(400).json({ message: "No Authorization Token" });
   }
 };
 
