@@ -15,6 +15,7 @@ const followUserSchema = new Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
+      unique: unique,
     },
   },
   { timestamps: true }
