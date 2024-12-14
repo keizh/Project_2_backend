@@ -21,6 +21,7 @@
     "mongoose": "^8.7.0",
     "nodemon": "^3.1.7",
     "socket.io": "^4.8.1",
+    "typescript": "^5.7.2",
     "uniqid": "^5.4.0"
   }
 }
